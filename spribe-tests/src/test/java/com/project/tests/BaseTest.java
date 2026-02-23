@@ -23,14 +23,21 @@ public abstract class BaseTest extends AbstractTestNGSpringContextTests {
     public void deleteCreatedPlayers() {
         List<Long> playerIds = createdPlayerIds.get();
 
-        if (playerIds != null) {
-            playerIds.forEach(playerId -> {
-                log.info("CLEANUP: deleting player: {} | thread: {}",
-                        playerId, Thread.currentThread().getId());
-                playerService.deleteBasePlayer(playerId);
-            });
+        if (playerIds == null || playerIds.isEmpty()) {
             createdPlayerIds.remove();
+            return;
         }
+
+        playerIds.forEach(playerId -> {
+            try {
+                log.info("CLEANUP: deleting player: {} | thread: {}", playerId, Thread.currentThread().getId());
+                playerService.deleteBasePlayer(playerId);
+            } catch (Exception e) {
+                log.warn("CLEANUP FAILED for playerId: {} | error: {}", playerId, e.getMessage());
+            }
+        });
+
+        createdPlayerIds.remove();
     }
 
     protected void registerForCleanup(Long playerId) {

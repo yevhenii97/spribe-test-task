@@ -3,6 +3,7 @@ package com.project.restapi.client;
 import com.project.restapi.models.*;
 import com.project.restapi.utils.JsonMapper;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,23 +27,27 @@ public class PlayerClient extends AbstractApiClient {
     @Value("${player.api.delete-player}")
     private String deletePlayerPath;
 
-    @Step("POST request: get player by Id")
-    public <T> ApiResult<T> getPlayerById(PlayerRequest payload, int expectedStatus, Class<T> type) {
-        return JsonMapper.map(post(baseUrl + getUserByIdPath, payload, expectedStatus), type);
+    @Step("Get player by Id request")
+    public <T> ApiResult<T> getPlayerById(PlayerRequest payload, Class<T> type) {
+        Response response = post(baseUrl + getUserByIdPath, payload);
+        return JsonMapper.map(response, type);
     }
 
-    @Step("GET request: create player")
-    public <T> ApiResult<T> createPlayer(String editor, Map<String, Object> queryParams, int expectedStatus, Class<T> type) {
-        return JsonMapper.map(get(String.format(baseUrl + createPlayerPath, editor), queryParams, expectedStatus), type);
+    @Step("Create player request")
+    public <T> ApiResult<T> createPlayer(String editor, Map<String, Object> queryParams, Class<T> type) {
+        Response response = get(String.format(baseUrl + createPlayerPath, editor), queryParams);
+        return JsonMapper.map(response, type);
     }
 
-    @Step("PATCH request: update player")
-    public <T> ApiResult<T> updatePlayer(String editor, String id, UpdatePlayerRequest body, int expectedStatus, Class<T> type) {
-        return JsonMapper.map(patch(String.format(baseUrl + updatePlayerPath, editor, id), body, expectedStatus), type);
+    @Step("Update player request")
+    public <T> ApiResult<T> updatePlayer(String editor, Long id, UpdatePlayerRequest body, Class<T> type) {
+        Response response = patch(String.format(baseUrl + updatePlayerPath, editor, id), body);
+        return JsonMapper.map(response, type);
     }
 
-    @Step("DELETE request: delete player by Id")
-    public <T> ApiResult<T> deletePlayerById(String editor, PlayerRequest payload, int expectedStatus, Class<T> type) {
-        return JsonMapper.map(delete(String.format(baseUrl + deletePlayerPath, editor), payload, expectedStatus), type);
+    @Step("Delete player by Id request")
+    public <T> ApiResult<T> deletePlayerById(String editor, PlayerRequest payload, Class<T> type) {
+        Response response = delete(String.format(baseUrl + deletePlayerPath, editor), payload);
+        return JsonMapper.map(response, type);
     }
 }

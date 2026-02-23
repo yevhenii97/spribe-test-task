@@ -3,7 +3,6 @@ package com.project.tests;
 import com.project.config.SpribeTestConfig;
 import com.project.restapi.client.PlayerClient;
 import com.project.restapi.models.*;
-import com.project.restapi.service.PlayerService;
 import com.project.testdata.CreatePlayerDataProvider;
 import io.qameta.allure.*;
 import io.qameta.allure.testng.AllureTestNg;
@@ -11,18 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @SpringBootTest(classes = SpribeTestConfig.class)
-@ContextConfiguration
-@DirtiesContext
 @Listeners({AllureTestNg.class})
 @Epic("Player API")
 @Feature("Create Player")
@@ -33,32 +29,35 @@ public class CreatePlayerTests extends BaseTest {
     @Autowired
     private PlayerClient playerClient;
 
+    private Map<String, Object> baseParameters() {
+        return new HashMap<>(Map.of(
+                "age", "18",
+                "gender", "male",
+                "login", "login_" + UUID.randomUUID(),
+                "role", "user",
+                "screenName", "screen_" + UUID.randomUUID()
+        ));
+    }
+
     @Test(dataProvider = "getEditors", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.BLOCKER)
     @Description("Verify that player can be crated with correct data and supervisor and admin editors")
     public void checkThatPlayerIsBeingCreatedSuccessfully(String editors) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", "17",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        );
+        Map<String, Object> parameters = baseParameters();
 
-        CreatePlayerResponse response =
-                playerClient.createPlayer(editors, parameters, 200, CreatePlayerResponse.class)
-                        .getBody();
+        ApiResult<CreatePlayerResponse> response =
+                playerClient.createPlayer(editors, parameters, CreatePlayerResponse.class);
 
-        Assert.assertNotNull(response.getId());
-        registerForCleanup(response.getId());
+        Assert.assertEquals(response.getStatus(), 200, "Expected status code is not equal actual");
+        Assert.assertNotNull(response.getBody().getId());
+        registerForCleanup(response.getBody().getId());
 
-        Assert.assertEquals(response.getAge(), parameters.get("age"), "Expected age is NOT equal actual");
-        Assert.assertEquals(response.getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
-        Assert.assertEquals(response.getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
-        Assert.assertEquals(response.getRole(), parameters.get("role"), "Expected role is NOT equal actual");
-        Assert.assertEquals(response.getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
+        Assert.assertEquals(response.getBody().getAge(), parameters.get("age"), "Expected age is NOT equal actual");
+        Assert.assertEquals(response.getBody().getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
+        Assert.assertEquals(response.getBody().getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
+        Assert.assertEquals(response.getBody().getRole(), parameters.get("role"), "Expected role is NOT equal actual");
+        Assert.assertEquals(response.getBody().getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
     }
 
     @Test(dataProvider = "getIncorrectEditors", dataProviderClass = CreatePlayerDataProvider.class)
@@ -66,18 +65,11 @@ public class CreatePlayerTests extends BaseTest {
     @Description("Verify that player can not be crated with incorrect editor")
     public void checkThatPlayerIsNotBeingCreatedBecauseOfIncorrectEditor(String editors) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", "17",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        );
 
         ApiResult<Void> response =
-                playerClient.createPlayer(editors, parameters, 403, Void.class);
+                playerClient.createPlayer(editors, baseParameters(), Void.class);
 
+        Assert.assertEquals(response.getStatus(), 403, "Expected status code is not equal actual");
         Assert.assertTrue(response.isEmptyBody(), "Response body should be empty");
     }
 
@@ -86,48 +78,39 @@ public class CreatePlayerTests extends BaseTest {
     @Description("Verify that player can not be crated with age out of range")
     public void checkThatPlayerIsNotBeingCreatedBecauseOfAgeOutOfRange(int age) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", age,
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        );
+
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("age", age);
 
         ApiResult<Void> response =
-                playerClient.createPlayer("supervisor", parameters, 400, Void.class);
+                playerClient.createPlayer("supervisor", parameters, Void.class);
 
+        Assert.assertEquals(response.getStatus(), 400, "Expected status code is not equal actual");
         Assert.assertTrue(response.isEmptyBody(), "Response body should be empty");
 
     }
 
     @Test(dataProvider = "getRole", dataProviderClass = CreatePlayerDataProvider.class)
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Verify that player can not crated with valid role")
+    @Severity(SeverityLevel.BLOCKER)
+    @Description("Verify that player can be crated with valid role")
     public void checkThatPlayerIsBeingCreatedWithValidRole(String role) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", "18",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", role,
-                "screenName", "test1"
-        );
 
-        CreatePlayerResponse response =
-                playerClient.createPlayer("supervisor", parameters, 200, CreatePlayerResponse.class)
-                        .getBody();
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("role", role);
 
-        Assert.assertNotNull(response.getId());
-        registerForCleanup(response.getId());
+        ApiResult<CreatePlayerResponse> response =
+                playerClient.createPlayer("supervisor", parameters, CreatePlayerResponse.class);
 
-        Assert.assertEquals(response.getAge(), parameters.get("age"), "Expected age is NOT equal actual");
-        Assert.assertEquals(response.getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
-        Assert.assertEquals(response.getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
-        Assert.assertEquals(response.getRole(), parameters.get("role"), "Expected role is NOT equal actual");
-        Assert.assertEquals(response.getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
+        Assert.assertEquals(response.getStatus(), 200, "Expected status code is not equal actual");
+        Assert.assertNotNull(response.getBody().getId());
+        registerForCleanup(response.getBody().getId());
+
+        Assert.assertEquals(response.getBody().getAge(), parameters.get("age"), "Expected age is NOT equal actual");
+        Assert.assertEquals(response.getBody().getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
+        Assert.assertEquals(response.getBody().getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
+        Assert.assertEquals(response.getBody().getRole(), parameters.get("role"), "Expected role is NOT equal actual");
+        Assert.assertEquals(response.getBody().getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
 
     }
 
@@ -138,21 +121,15 @@ public class CreatePlayerTests extends BaseTest {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         String uniqueLogin  = "test1login_"+ System.currentTimeMillis();
 
-        Map<String, Object> parameters = Map.of(
-                "age", "18",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", uniqueLogin,
-                "role", "user",
-                "screenName", "test1"
-        );
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("login", uniqueLogin);
 
-        CreatePlayerResponse createUser =
-                playerClient.createPlayer("supervisor", parameters, 200, CreatePlayerResponse.class)
-                        .getBody();
+        ApiResult<CreatePlayerResponse> createUser =
+                playerClient.createPlayer("supervisor", parameters, CreatePlayerResponse.class);
 
-        Assert.assertNotNull(createUser.getId());
-        registerForCleanup(createUser.getId());
+        Assert.assertEquals(createUser.getStatus(), 200, "Expected status code is not equal actual");
+        Assert.assertNotNull(createUser.getBody().getId());
+        registerForCleanup(createUser.getBody().getId());
 
         Map<String, Object> secondParametersForDuplicate = Map.of(
                 "age", "34",
@@ -160,11 +137,12 @@ public class CreatePlayerTests extends BaseTest {
                 "gender", "female",
                 "login", uniqueLogin,
                 "role", "user",
-                "screenName", "test2"
+                "screenName", "testScreenName_" + UUID.randomUUID()
         );
 
-        ApiResult<Void> duplicate =  playerClient.createPlayer("supervisor", secondParametersForDuplicate, 400, Void.class);
+        ApiResult<Void> duplicate =  playerClient.createPlayer("supervisor", secondParametersForDuplicate, Void.class);
 
+        Assert.assertEquals(duplicate.getStatus(), 400, "Expected status code is not equal actual");
         Assert.assertTrue(duplicate.isEmptyBody(), "Expected empty body on duplicate login");
 
     }
@@ -176,33 +154,28 @@ public class CreatePlayerTests extends BaseTest {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         String uniqueScreenName  = "test1screenName_"+ System.currentTimeMillis();
 
-        Map<String, Object> parameters = Map.of(
-                "age", "18",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "test1login",
-                "role", "user",
-                "screenName", uniqueScreenName
-        );
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("screenName", uniqueScreenName);
 
-        CreatePlayerResponse createUser =
-                playerClient.createPlayer("supervisor", parameters, 200, CreatePlayerResponse.class)
-                        .getBody();
+        ApiResult<CreatePlayerResponse> createUser =
+                playerClient.createPlayer("supervisor", parameters, CreatePlayerResponse.class);
 
-        Assert.assertNotNull(createUser.getId());
-        registerForCleanup(createUser.getId());
+        Assert.assertEquals(createUser.getStatus(), 200, "Expected status code is not equal actual");
+        Assert.assertNotNull(createUser.getBody().getId());
+        registerForCleanup(createUser.getBody().getId());
 
         Map<String, Object> secondParametersForDuplicate = Map.of(
                 "age", "34",
                 "editor", "supervisor",
                 "gender", "female",
-                "login", "test2login",
+                "login", "testLogin_" + UUID.randomUUID(),
                 "role", "user",
                 "screenName", uniqueScreenName
         );
 
-        ApiResult<Void> duplicate =  playerClient.createPlayer("supervisor", secondParametersForDuplicate, 400, Void.class);
+        ApiResult<Void> duplicate =  playerClient.createPlayer("supervisor", secondParametersForDuplicate, Void.class);
 
+        Assert.assertEquals(duplicate.getStatus(), 400, "Expected status code is not equal actual");
         Assert.assertTrue(duplicate.isEmptyBody(), "Expected empty body on duplicate screenName");
 
     }
@@ -214,68 +187,37 @@ public class CreatePlayerTests extends BaseTest {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         log.info("Testing valid password case: {}", description);
 
-        Map<String, Object> parameters = Map.of(
-                "age", "18",
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1",
-                "password", password
-        );
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("password", password);
 
         ApiResult<Void> response =
-                playerClient.createPlayer("supervisor", parameters, 400, Void.class);
+                playerClient.createPlayer("supervisor", parameters, Void.class);
 
+        Assert.assertEquals(response.getStatus(), 400, "Expected status code is not equal actual");
         Assert.assertTrue(response.isEmptyBody(), "Expected empty body on invalid password");
     }
 
     @Test(dataProvider = "getGender", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.NORMAL)
     @Description("Verify that player can be crated with correct gender")
-    public void checkThatPlayerNotBeingCreatedWithValidGender(String gender) {
+    public void checkThatPlayerBeingCreatedWithValidGender(String gender) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", "17",
-                "editor", "supervisor",
-                "gender", gender,
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        );
 
-        CreatePlayerResponse response =
-                playerClient.createPlayer("supervisor", parameters, 200, CreatePlayerResponse.class)
-                        .getBody();
+        Map<String, Object> parameters = baseParameters();
+        parameters.put("gender", gender);
 
-        Assert.assertNotNull(response.getId());
-        registerForCleanup(response.getId());
+        ApiResult<CreatePlayerResponse> response =
+                playerClient.createPlayer("supervisor", parameters, CreatePlayerResponse.class);
 
-        Assert.assertEquals(response.getAge(), parameters.get("age"), "Expected age is NOT equal actual");
-        Assert.assertEquals(response.getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
-        Assert.assertEquals(response.getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
-        Assert.assertEquals(response.getRole(), parameters.get("role"), "Expected role is NOT equal actual");
-        Assert.assertEquals(response.getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
-    }
+        Assert.assertEquals(response.getStatus(), 200, "Expected status code is not equal actual");
+        Assert.assertNotNull(response.getBody().getId());
+        registerForCleanup(response.getBody().getId());
 
-    @Test()
-    @Severity(SeverityLevel.CRITICAL)
-    @Description("Verify that player can not be crated with incorrect editor")
-    public void checkThatPlayerIsNotBeingCreatedBecauseOfInvalidEditor() {
-        log.info("Thread ID: {}", Thread.currentThread().getId());
-        Map<String, Object> parameters = Map.of(
-                "age", 19,
-                "editor", "user",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        );
-
-        ApiResult<Void> response =
-                playerClient.createPlayer("user", parameters, 403, Void.class);
-
-        Assert.assertTrue(response.isEmptyBody(), "Response body should be empty");
+        Assert.assertEquals(response.getBody().getAge(), parameters.get("age"), "Expected age is NOT equal actual");
+        Assert.assertEquals(response.getBody().getGender(), parameters.get("gender"), "Expected gender is NOT equal actual");
+        Assert.assertEquals(response.getBody().getLogin(), parameters.get("login"), "Expected login is NOT equal actual");
+        Assert.assertEquals(response.getBody().getRole(), parameters.get("role"), "Expected role is NOT equal actual");
+        Assert.assertEquals(response.getBody().getScreenName(), parameters.get("screenName"), "Expected screenName is NOT equal actual");
     }
 
     @Test(dataProvider = "missingRequiredFields", dataProviderClass = CreatePlayerDataProvider.class)
@@ -285,24 +227,15 @@ public class CreatePlayerTests extends BaseTest {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         log.info("Testing required fields case: {}", description);
 
-        Map<String, Object> parameters = new HashMap<>(
-                Map.of(
-                "age", 19,
-                "editor", "supervisor",
-                "gender", "male",
-                "login", "123456",
-                "role", "user",
-                "screenName", "test1"
-        ));
-
+        Map<String, Object> parameters = baseParameters();
         parameters.remove(field);
 
-        ErrorResponse response =
-                playerClient.createPlayer("supervisor", parameters, 400, ErrorResponse.class).getBody();
+        ApiResult<ErrorResponse> response =
+                playerClient.createPlayer("supervisor", parameters, ErrorResponse.class);
 
-        Assert.assertEquals(response.getStatus(), Integer.valueOf(400));
-        Assert.assertEquals(response.getError(), "Bad Request");
-        Assert.assertEquals(response.getPath(), "/player/create/supervisor");
+        Assert.assertEquals(response.getStatus(), 400, "Expected status code is not equal actual");
+        Assert.assertEquals(response.getBody().getError(), "Bad Request");
+        Assert.assertEquals(response.getBody().getPath(), "/player/create/supervisor");
 
     }
 }
