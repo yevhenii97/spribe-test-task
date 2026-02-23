@@ -1,0 +1,3 @@
+rootProject.name = 'spribe-test-task'
+include (':rest-api')
+include (':spribe-tests')

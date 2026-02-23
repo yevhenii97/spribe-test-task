@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2'
+}
+
+def frameworkProps = new Properties()
+file('src/test/resources/framework.properties').withInputStream {
+    frameworkProps.load(it)
+}
+
+dependencies {
+    implementation project(':rest-api')
+}
+
+test {
+    useTestNG()
+            {
+                parallel = frameworkProps.getProperty('parallel.mode')
+                threadCount = frameworkProps.getProperty('thread.count').toInteger()
+            }
+
+    outputs.upToDateWhen { false }
+}
+
+description = 'Spribe Api Tests'

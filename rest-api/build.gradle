@@ -1,0 +1,5 @@
+description = 'rest-api'
+
+dependencies {
+    implementation("io.rest-assured:rest-assured:5.5.1")
+}
