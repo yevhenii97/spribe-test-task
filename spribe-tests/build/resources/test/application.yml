@@ -1,7 +1,0 @@
-player:
-  api:
-    base-url: http://3.68.165.45/
-    get-user-by-id: player/get
-    create-player: player/create/%s
-    update-player: player/update/%s/%s
-    delete-player: player/delete/%s
