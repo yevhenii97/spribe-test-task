@@ -3,7 +3,7 @@ package com.project.tests;
 import com.project.config.SpribeTestConfig;
 import com.project.restapi.client.PlayerClient;
 import com.project.restapi.models.*;
-import com.project.restapi.service.PlayerService;
+import com.project.restapi.service.PlayerValidationService;
 import com.project.testdata.UpdatePlayerDataProvider;
 import io.qameta.allure.*;
 import io.qameta.allure.testng.AllureTestNg;
@@ -26,7 +26,7 @@ public class UpdatePlayerTests extends BaseTest {
     @Autowired
     private PlayerClient playerClient;
     @Autowired
-    private PlayerService playerService;
+    private PlayerValidationService playerValidationService;
 
     @Test(dataProvider = "validUpdateRequests", dataProviderClass = UpdatePlayerDataProvider.class)
     @Severity(SeverityLevel.BLOCKER)
@@ -49,7 +49,7 @@ public class UpdatePlayerTests extends BaseTest {
 
         Assert.assertEquals(response.getStatus(), 200, "Expected status code is not equal actual");
 //       if only I had DB access, it would be easier than current validation
-        playerService.assertUpdatedPlayer(
+        playerValidationService.assertUpdatedPlayer(
                 getPlayer,
                 response.getBody(),
                 updatePlayerRequest,

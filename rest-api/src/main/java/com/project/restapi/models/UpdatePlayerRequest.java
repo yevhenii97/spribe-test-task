@@ -74,7 +74,7 @@ public class UpdatePlayerRequest {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         UpdatePlayerRequest that = (UpdatePlayerRequest) o;
-        return age == that.age && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
+        return Objects.equals(age, that.age) && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
     }
 
     @Override

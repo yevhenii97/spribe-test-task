@@ -41,7 +41,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "getEditors", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Verify that player can be crated with correct data and supervisor and admin editors")
+    @Description("Verify that player can be created with correct data and supervisor and admin editors")
     public void checkThatPlayerIsBeingCreatedSuccessfully(String editors) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         Map<String, Object> parameters = baseParameters();
@@ -62,7 +62,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "getIncorrectEditors", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Verify that player can not be crated with incorrect editor")
+    @Description("Verify that player can not be created with incorrect editor")
     public void checkThatPlayerIsNotBeingCreatedBecauseOfIncorrectEditor(String editors) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
 
@@ -75,7 +75,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "getAge", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that player can not be crated with age out of range")
+    @Description("Verify that player can not be created with age out of range")
     public void checkThatPlayerIsNotBeingCreatedBecauseOfAgeOutOfRange(int age) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
 
@@ -92,7 +92,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "getRole", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Verify that player can be crated with valid role")
+    @Description("Verify that player can be created with valid role")
     public void checkThatPlayerIsBeingCreatedWithValidRole(String role) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
 
@@ -116,7 +116,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test()
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Verify that player can not be crated with login that already exist")
+    @Description("Verify that player can not be created with login that already exist")
     public void createPlayerWithDuplicateLoginTest() {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         String uniqueLogin  = "test1login_"+ System.currentTimeMillis();
@@ -149,7 +149,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test()
     @Severity(SeverityLevel.BLOCKER)
-    @Description("Verify that player can not be crated with screenName that already exist")
+    @Description("Verify that player can not be created with screenName that already exist")
     public void createPlayerWithDuplicateScreenNameTest() {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         String uniqueScreenName  = "test1screenName_"+ System.currentTimeMillis();
@@ -182,10 +182,10 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "invalidPasswords", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that player can not be crated with invalid password")
+    @Description("Verify that player can not be created with invalid password")
     public void checkThatPlayerIsNotBeingCreatedWithInvalidPassword(String password, String description) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
-        log.info("Testing valid password case: {}", description);
+        log.info("Testing invalid password case: {}", description);
 
         Map<String, Object> parameters = baseParameters();
         parameters.put("password", password);
@@ -199,7 +199,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "getGender", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that player can be crated with correct gender")
+    @Description("Verify that player can be created with correct gender")
     public void checkThatPlayerBeingCreatedWithValidGender(String gender) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
 
@@ -222,7 +222,7 @@ public class CreatePlayerTests extends BaseTest {
 
     @Test(dataProvider = "missingRequiredFields", dataProviderClass = CreatePlayerDataProvider.class)
     @Severity(SeverityLevel.NORMAL)
-    @Description("Verify that player can not be crated without required fields")
+    @Description("Verify that player can not be created without required fields")
     public void checkThatPlayerIsNotBeingCreatedWithoutRequiredFields(String field, String description) {
         log.info("Thread ID: {}", Thread.currentThread().getId());
         log.info("Testing required fields case: {}", description);

@@ -3,7 +3,6 @@ package com.project.tests;
 import com.project.config.SpribeTestConfig;
 import com.project.restapi.client.PlayerClient;
 import com.project.restapi.models.*;
-import com.project.restapi.service.PlayerService;
 import com.project.testdata.GetPlayerByIdDataProvider;
 import io.qameta.allure.*;
 import io.qameta.allure.testng.AllureTestNg;
@@ -27,8 +26,6 @@ public class GetPlayerByIdTests extends BaseTest {
 
     @Autowired
     private PlayerClient playerClient;
-    @Autowired
-    private PlayerService playerService;
 
     @Test()
     @Severity(SeverityLevel.BLOCKER)
