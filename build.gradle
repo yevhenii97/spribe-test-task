@@ -52,6 +52,9 @@ subprojects {
 
         // Jackson
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+
+        // AssertJ
+        testImplementation 'org.assertj:assertj-core:3.27.7'
     }
 
     test {

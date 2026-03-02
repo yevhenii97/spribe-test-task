@@ -9,12 +9,12 @@ public class CreatePlayerResponse {
     private String password;
     private String screenName;
     private String gender;
-    private int age;
+    private Integer age;
     private String role;
 
     public CreatePlayerResponse() {}
 
-    public CreatePlayerResponse(Long id, String login, String password, String screenName, String gender, int age, String role) {
+    public CreatePlayerResponse(Long id, String login, String password, String screenName, String gender, Integer age, String role) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -64,11 +64,11 @@ public class CreatePlayerResponse {
         this.gender = gender;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -84,7 +84,7 @@ public class CreatePlayerResponse {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         CreatePlayerResponse that = (CreatePlayerResponse) o;
-        return age == that.age && Objects.equals(id, that.id) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(screenName, that.screenName) && Objects.equals(gender, that.gender) && Objects.equals(role, that.role);
+        return Objects.equals(id, that.id) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(screenName, that.screenName) && Objects.equals(gender, that.gender) && Objects.equals(age, that.age) && Objects.equals(role, that.role);
     }
 
     @Override

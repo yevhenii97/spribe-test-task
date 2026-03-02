@@ -5,7 +5,7 @@ import java.util.Objects;
 public class UpdatePlayerResponse {
 
     private Long id;
-    private int age;
+    private Integer age;
     private String gender;
     private String login;
     private String role;
@@ -13,7 +13,7 @@ public class UpdatePlayerResponse {
 
     public UpdatePlayerResponse() {}
 
-    public UpdatePlayerResponse(Long id, int age, String gender, String login, String role, String screenName) {
+    public UpdatePlayerResponse(Long id, Integer age, String gender, String login, String role, String screenName) {
         this.id = id;
         this.age = age;
         this.gender = gender;
@@ -30,11 +30,11 @@ public class UpdatePlayerResponse {
         this.id = id;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -74,7 +74,7 @@ public class UpdatePlayerResponse {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         UpdatePlayerResponse that = (UpdatePlayerResponse) o;
-        return age == that.age && Objects.equals(id, that.id) && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
+        return Objects.equals(id, that.id) && Objects.equals(age, that.age) && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
     }
 
     @Override

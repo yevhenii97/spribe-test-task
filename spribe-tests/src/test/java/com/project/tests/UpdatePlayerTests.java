@@ -52,8 +52,7 @@ public class UpdatePlayerTests extends BaseTest {
         playerValidationService.assertUpdatedPlayer(
                 getPlayer,
                 response.getBody(),
-                updatePlayerRequest,
-                description
+                updatePlayerRequest
         );
     }
 

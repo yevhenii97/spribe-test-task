@@ -5,7 +5,7 @@ import java.util.Objects;
 public class GetPlayerResponse {
 
     private Long id;
-    private int age;
+    private Integer age;
     private String gender;
     private String login;
     private String password;
@@ -14,7 +14,7 @@ public class GetPlayerResponse {
 
     public GetPlayerResponse() {}
 
-    public GetPlayerResponse(Long id, int age, String gender, String login, String password, String role, String screenName) {
+    public GetPlayerResponse(Long id, Integer age, String gender, String login, String password, String role, String screenName) {
         this.id = id;
         this.age = age;
         this.gender = gender;
@@ -32,11 +32,11 @@ public class GetPlayerResponse {
         this.id = id;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -84,7 +84,7 @@ public class GetPlayerResponse {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         GetPlayerResponse that = (GetPlayerResponse) o;
-        return age == that.age && Objects.equals(id, that.id) && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
+        return Objects.equals(id, that.id) && Objects.equals(age, that.age) && Objects.equals(gender, that.gender) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(role, that.role) && Objects.equals(screenName, that.screenName);
     }
 
     @Override
